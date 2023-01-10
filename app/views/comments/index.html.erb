@@ -1,0 +1,16 @@
+<div class="container">
+  <div class="d-flex justify-content-center my-3">
+    <%= link_to 'Do you have a Comment?', new_post_comment_path, class: "badge rounded-pill bg-primary" %>
+  </div>
+
+  <% @comments.each do |comment| %>
+    <%= comment.user.email  %>
+    <div class="card">
+      <div class="card-body">
+        <%= comment.content %>
+      </div>
+    </div>
+    <%= button_to 'delete', post_comment_path(@post, comment), method: :delete, class: "btn btn-outline-danger mt-2" %>
+  <% end %>
+
+</div>
