@@ -3,7 +3,7 @@ class PostsController < ApplicationController
   before_action :set_post, only: [:edit, :update, :destroy]
 
   def index
-    @posts = Post.includes(:user).all
+    @posts = Post.includes(:user).public_tag
   end
 
   def new
@@ -31,14 +31,14 @@ class PostsController < ApplicationController
 
   def destroy
     if @post.destroy
-      redirect_to posts_path, notice: "post successfully deleted"
+      redirect_to post_paths, notice: "post successfully deleted"
     end
   end
 
   private
 
   def post_params
-    params.require(:post).permit(:name, :image, :content,)
+    params.require(:post).permit(:name, :image, :content, :tags)
   end
 
   def set_post

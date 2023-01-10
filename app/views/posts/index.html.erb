@@ -8,6 +8,9 @@
 <div class="container">
   <% @posts.each do |post| %>
     <div class="card bg-light">
+      <div class="card-header alert alert-light">
+        <%= post.tags %>
+      </div>
       <p class="d-flex justify-content-center mt-4"><%= image_tag post.image.url, class: "card-img-top", style: "height: 300px; width: 450px" if post.image? %></p>
       <div class="card-body">
         <h4 class="card-title"><%= post.user.email %></h4>

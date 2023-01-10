@@ -22,7 +22,7 @@
       <p class="small">Who will be seeing this Post</p>
       <h6>
         <% Post.tags.keys.each do |tag| %>
-          <%= f.radio_button :tag, tag %>
+          <%= f.radio_button :tags, tag %>
           <%= f.label tag.to_sym %>
         <% end %></h6>
     </div>
