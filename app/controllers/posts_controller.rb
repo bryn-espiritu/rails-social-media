@@ -1,6 +1,8 @@
 class PostsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_post, only: [:edit, :update, :destroy]
+  include Pundit
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   def index
     @posts = Post.includes(:user).public_tag
@@ -43,6 +45,13 @@ class PostsController < ApplicationController
 
   def set_post
     @post = Post.find(params[:id] || params[:post_id])
+  end
+
+  def user_not_authorized(exception)
+    policy_name = exception.policy.class.to_s.underscore
+    flash[:alert] = t "#{policy_name}.#{exception.query}", scope: 'pundit', default: :default,
+                      username: exception.policy.record&.user&.email
+    redirect_to(request.referrer || root_path)
   end
 
 end
