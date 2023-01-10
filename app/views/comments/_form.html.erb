@@ -1,0 +1,17 @@
+
+
+<%= form_with model: comment, url: path do |f| %>
+  <% if @comment.errors.any? %>
+    <ul>
+      <% @comment.errors.each do |error| %>
+        <li><%= error.full_message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <div class="field my-3">
+    Create One!
+    <%= f.text_area :content, class: 'form-control mb-3', placeholder: "What's your Comment?" %>
+    <%= f.submit "Post", class: "btn btn-outline-primary" %>
+  </div>
+<% end %>
