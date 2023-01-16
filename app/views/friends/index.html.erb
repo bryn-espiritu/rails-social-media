@@ -1,2 +1,12 @@
-<h1>Friends#index</h1>
-<p>Find me in app/views/friends/index.html.erb</p>
+<h2 class="text-center">Friends List</h2>
+<div class="container">
+<% @friends.each do |fr| %>
+    <div class="card w-75">
+      <div class="card-body">
+        <h5 class="card-title"><%= fr.email  %></h5>
+        <p class="card-text"></p>
+        <%= button_to "Remove Friend", friend_path(fr), method: :delete, class: "btn btn-outline-danger" %>
+      </div>
+    </div>
+<% end %>
+</div>

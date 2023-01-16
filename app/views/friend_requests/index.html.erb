@@ -1,0 +1,40 @@
+<div class="container">
+  <h3 class="text-center">Explore</h3>
+  <% @strangers.each do |str| %>
+    <div class="card w-75 mb-2">
+      <div class="card-body">
+        <h5 class="card-title"><%= str.email  / %></h5>
+        <div class="d-flex">
+          <%= button_to "Add Friend", { action: :create, controller: 'friend_requests', friend_id: str.id }, class: 'btn btn-dark', method: :post %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <h3 class="text-center" >Friend Requests</h3>
+  <% @incoming.each do |req| %>
+    <div class="card w-75">
+      <div class="card-body">
+        <h5 class="card-title"><%= req.email %></h5>
+        <div class="d-flex">
+        <%= button_to "Accept", friend_requests_path(req), method: :patch, class: "btn btn-outline-primary" %>
+        <%= button_to "Cancel", friend_requests_path(req), method: :delete, class: "btn btn-outline-danger" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+
+  <h3 class= "text-center"> Pending Requests</h3>
+  <% @outgoing.each do |pending| %>
+    <div class="card w-75">
+      <div class="card-body">
+        <h5 class="card-title"><%= pending.friend.email %></h5>
+        <div class="d-flex">
+          <%= button_to "Cancel", friend_requests_path(pending), method: :delete, class: "btn btn-outline-danger" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+</div>

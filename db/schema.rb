@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_10_094333) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_13_054130) do
   create_table "comments", charset: "utf8mb4", force: :cascade do |t|
     t.string "content"
     t.bigint "post_id"
@@ -39,17 +39,35 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_10_094333) do
     t.index ["user_id"], name: "index_friendships_on_user_id"
   end
 
+  create_table "group_member_ships", charset: "utf8mb4", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "group_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_id"], name: "index_group_member_ships_on_group_id"
+    t.index ["user_id"], name: "index_group_member_ships_on_user_id"
+  end
+
   create_table "groups", charset: "utf8mb4", force: :cascade do |t|
     t.string "name"
     t.string "description"
-    t.string "role"
     t.string "banner"
     t.bigint "user_id"
     t.bigint "owner_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "state"
     t.index ["owner_id"], name: "index_groups_on_owner_id"
     t.index ["user_id"], name: "index_groups_on_user_id"
+  end
+
+  create_table "post_group_ships", charset: "utf8mb4", force: :cascade do |t|
+    t.bigint "post_id"
+    t.bigint "group_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["group_id"], name: "index_post_group_ships_on_group_id"
+    t.index ["post_id"], name: "index_post_group_ships_on_post_id"
   end
 
   create_table "posts", charset: "utf8mb4", force: :cascade do |t|
@@ -83,6 +101,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_10_094333) do
     t.datetime "updated_at", null: false
     t.string "provider", limit: 50, default: "", null: false
     t.string "uid", limit: 500, default: "", null: false
+    t.integer "role", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

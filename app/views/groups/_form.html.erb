@@ -1,0 +1,15 @@
+<div class="container bg-light w-50">
+  <%= form_with model: group, url: path do |f| %>
+    <label for="Banner" class="form-label mt-3">Cover Banner</label>
+    <%= f.file_field :banner, class: 'form-control mb-3' %>
+
+    <label for="Name">Name</label>
+    <%= f.text_field :name, class: 'form-control mb-3' %>
+
+    <label for="Description">Description</label>
+    <%= f.text_area :description, class: 'form-control mb-3' %>
+
+    <%= f.submit "Create", class: "btn btn-outline-success mb-3" %>
+  <% end %>
+
+</div>

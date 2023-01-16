@@ -1,20 +1,50 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>App</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<head>
+  <title>Koda Camp | Social Media</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-  </head>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+</head>
 
-  <body>
-  <span>
+<body>
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand">Social Media | Koda Camp</a>
+    <div class="d-flex">
+      <% if user_signed_in? %>
+        <button class=" badge bg-secondary me-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <%= "Welcome #{current_user.email}" %></button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <%= button_to 'Sign-Out', destroy_user_session_path, class: "btn btn-sm btn-outline-danger mb-1", method: :delete %>
+            <%= link_to 'Friends list', friends_path, class: "btn btn-sm btn-outline-info mb-1"%>
+            <%= link_to 'Requests', friend_requests_path, class: "btn btn-sm btn-outline-info mb-1" %>
+          </div>
+        </div>
+      <% end %>
+
+
+
+      <button class="nav-item dropdown btn btn-outline-dark me-3">
+        <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="navbar-toggler-icon"></span></a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <li><%= link_to "Profile", posts_path, class: "nav-link mb-3", style: "background: none; border: none; color: green" %></li>
+          <li> <%= link_to "Groups", groups_path, class: "nav-link", style: "background: none; border: none; color: green" if user_signed_in? %></li>
+        </ul>
+      </button>
+    </div>
+  </div>
+</nav>
+
+
+<span>
       <span class="notice" style="color: green"><%= notice %></span>
        <span class="alert" style="color: red"><%= alert %></span>
   </span>
-    <%= yield %>
-  </body>
+<%= yield %>
+</body>
 </html>

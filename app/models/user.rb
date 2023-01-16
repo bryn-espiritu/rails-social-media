@@ -5,6 +5,14 @@ class User < ApplicationRecord
   has_many :pending_friends, through: :friend_requests, source: :friend
   has_many :friendships, dependent: :destroy
   has_many :friends, through: :friendships
+
+  has_many :group_member_ships
+  has_many :groups, through: :group_member_ships
+
+
+  #Using integer to identify the role of the user
+  enum tags: { normal: 0, moderator: 1, admin: 2 }
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [:facebook, :github, :google_oauth2]
@@ -17,6 +25,6 @@ class User < ApplicationRecord
   end
 
   def remove_friend(friend)
-    current_user.friends.destroy(friend)
+    self.friends.destroy(friend)
   end
 end

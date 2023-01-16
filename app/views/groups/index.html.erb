@@ -1,0 +1,17 @@
+<div class="container">
+<div class="d-flex justify-content-center">
+<h3>Welcome to Group <%= "#{current_user.email}" %> <span class="small"><%= link_to "Create New Group", new_group_path, class: "badge bg-dark", style: "text-decoration: none"  %></span></h3>
+</div>
+
+  <% @groups.each do |group| %>
+    <div class="card bg-dark text-white mb-2">
+      <%= image_tag group.banner.url, class: "card-img", style: "height: 300px" if group.banner? %>
+      <div class="card-img-overlay">
+        <h5 class="card-title"><%= group.name %></h5>
+        <p class="card-text"><%= group.description %></p>
+        <p class="card-text">Updated at <%= group.updated_at  %></p>
+      </div>
+    </div>
+  <% end %>
+
+</div>

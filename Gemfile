@@ -36,6 +36,8 @@ gem 'carrierwave', '>= 3.0.0.beta', '< 4.0'
 
 gem 'pundit'
 
+gem 'aasm'
+
 gem 'omniauth'
 gem 'omniauth-facebook'
 gem 'omniauth-github'
