@@ -1,20 +1,16 @@
 class User < ApplicationRecord
-  has_many :posts
-  has_many :comments
+  has_many :posts, dependent: :destroy
+  has_many :comments, dependent: :destroy
   has_many :friend_requests, dependent: :destroy
+  has_many :received_friend_requests, class_name: "FriendRequest", foreign_key: :friend_id, dependent: :destroy
   has_many :pending_friends, through: :friend_requests, source: :friend
   has_many :friendships, dependent: :destroy
   has_many :friends, through: :friendships
-
-  has_many :group_member_ships
+  has_many :group_member_ships, dependent: :destroy
   has_many :groups, through: :group_member_ships
 
+  enum role: { normal: 0, moderator: 1, admin: 2 }
 
-  #Using integer to identify the role of the user
-  enum tags: { normal: 0, moderator: 1, admin: 2 }
-
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :validatable, :omniauthable, omniauth_providers: [:facebook, :github, :google_oauth2]
 
   def self.create_from_provider_data(provider_data)
@@ -25,6 +21,6 @@ class User < ApplicationRecord
   end
 
   def remove_friend(friend)
-    self.friends.destroy(friend)
+    friends.destroy(friend)
   end
 end
