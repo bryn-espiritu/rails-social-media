@@ -1,16 +1,14 @@
-<div class="container">
-  <div class="d-flex justify-content-center my-3">
-    <%= link_to 'Do you have a Comment?', new_post_comment_path, class: "badge rounded-pill bg-primary" %>
-  </div>
-
+<div class="container my-4">
+  <h2>Comments</h2>
+  <%= link_to "Add comment", new_post_comment_path(@post), class: "btn btn-primary mb-3" %>
   <% @comments.each do |comment| %>
-    <%= comment.user.email  %>
-    <div class="card">
-      <div class="card-body">
-        <%= comment.content %>
-      </div>
-    </div>
-    <%= button_to 'delete', post_comment_path(@post, comment), method: :delete, class: "btn btn-outline-danger mt-2" %>
+    <div class="card mb-2"><div class="card-body">
+      <strong><%= comment.user.email %></strong>
+      <p><%= comment.content %></p>
+      <% if comment.user_id == current_user.id %>
+        <%= link_to "Edit", edit_post_comment_path(@post, comment), class: "btn btn-sm btn-outline-secondary" %>
+        <%= button_to "Delete", post_comment_path(@post, comment), method: :delete, class: "btn btn-sm btn-outline-danger d-inline-block" %>
+      <% end %>
+    </div></div>
   <% end %>
-
 </div>
