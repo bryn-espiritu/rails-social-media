@@ -50,7 +50,7 @@ class CommentsController < ApplicationController
   def authorize_comment_owner!
     return if @comment.user_id == current_user.id
 
-    redirect_to post_comments_path(@post), alert: "You can only change your own comments."
+    redirect_to(post_comments_path(@post), alert: "You can only change your own comments.") and return
   end
 
   def comment_params
