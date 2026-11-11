@@ -10,8 +10,8 @@ class Post < ApplicationRecord
   validates :tags, presence: true
 
   scope :visible_to, ->(viewer) {
-    where(tags: tags[:public_tag])
+    where(tags: "public_tag")
       .or(where(user_id: viewer.id))
-      .or(where(tags: tags[:friends_only], user_id: viewer.friends.select(:id)))
+      .or(where(tags: "friends_only", user_id: viewer.friends.select(:id)))
   }
 end
