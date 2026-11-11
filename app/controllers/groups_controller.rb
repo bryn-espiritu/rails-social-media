@@ -1,9 +1,10 @@
 class GroupsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_group, only: [:edit, :update, :destroy]
+  before_action :authorize_owner!, only: [:edit, :update, :destroy]
 
   def index
-    @groups = Group.all
+    @groups = Group.order(created_at: :desc)
   end
 
   def new
@@ -12,26 +13,27 @@ class GroupsController < ApplicationController
 
   def create
     @group = Group.new(group_params)
+    @group.owner_id = current_user.id
     if @group.save
-      redirect_to groups_path, notice: "Group Successfully Created"
+      redirect_to groups_path, notice: "Group successfully created."
     else
-      flash[:alert] = @group.errors.full_messages.join(', ')
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
   def edit; end
 
   def update
-    if @group.update(post_params)
-      redirect_to groups_path
+    if @group.update(group_params)
+      redirect_to groups_path, notice: "Group updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    if @group.destroy
-      redirect_to groups_path, notice: "Group successfully deleted"
-    end
+    @group.destroy!
+    redirect_to groups_path, notice: "Group deleted.", status: :see_other
   end
 
   private
@@ -41,6 +43,12 @@ class GroupsController < ApplicationController
   end
 
   def set_group
-    @group = Group.find(params[:id] || params[:post_id])
+    @group = Group.find(params[:id])
+  end
+
+  def authorize_owner!
+    return if @group.owner_id == current_user.id
+
+    redirect_to groups_path, alert: "Only the group owner can modify this group."
   end
 end
