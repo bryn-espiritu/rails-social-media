@@ -7,7 +7,7 @@ class PostPolicy
   end
 
   def update?
-    record.user = user
+    user.present? && record.user_id == user.id
   end
 
   def edit?
@@ -15,6 +15,6 @@ class PostPolicy
   end
 
   def destroy?
-    edit?
+    update?
   end
 end
