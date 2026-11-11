@@ -1,23 +1,13 @@
 class FriendsController < ApplicationController
-  before_action :set_friend, only: :destroy
+  before_action :authenticate_user!
 
   def index
-    @friends = current_user.friends
-
+    @friends = current_user.friends.order(:email)
   end
 
   def destroy
-    @friend = current_user.remove_friend(@friend)
-    if @friend.save
-    redirect_to friends_path, notice: "Successfully Removed"
-    else
-      redirect_to friends_path, alert: "Error. Please Try again later"
-      end
-  end
-
-  private
-
-  def set_friend
-    @friend = current_user.friends.find(params[:id] || params[:friend_id])
+    friend = current_user.friends.find(params[:id])
+    current_user.remove_friend(friend)
+    redirect_to friends_path, notice: "Friend removed.", status: :see_other
   end
 end

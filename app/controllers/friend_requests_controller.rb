@@ -1,38 +1,46 @@
 class FriendRequestsController < ApplicationController
-  before_action :set_friend_request, except: [:index, :create]
+  before_action :authenticate_user!
+  before_action :set_friend_request, only: [:update, :destroy]
 
   def index
-    @incoming = FriendRequest.where(friend: current_user)
-    @outgoing = current_user.friend_requests
-    @strangers = User.where.not(id: current_user)
+    @incoming = FriendRequest.includes(:user).where(friend: current_user)
+    @outgoing = current_user.friend_requests.includes(:friend)
+    excluded_ids = current_user.friends.select(:id)
+    @strangers = User.where.not(id: current_user.id)
+                     .where.not(id: excluded_ids)
+                     .where.not(id: @incoming.select(:user_id))
+                     .where.not(id: @outgoing.select(:friend_id))
+                     .order(:email)
   end
 
   def create
     friend = User.find(params[:friend_id])
-    @friend_request = current_user.friend_requests.new(friend: friend)
-    if @friend_request.save
-      render :index, status: :created, location: @friend_request
+    request = current_user.friend_requests.new(friend: friend)
+    if request.save
+      redirect_to friend_requests_path, notice: "Friend request sent."
     else
-      render json: @friend_request.errors, status: :unprocessable_entity
+      redirect_to friend_requests_path, alert: request.errors.full_messages.to_sentence
     end
   end
 
   def update
-    @friend_request.accept
-    if @friend_request.save
-      redirect_to friend_requests_path, notice: "Friend Accepted"
-    else
-      redirect_to friend_requests_path, alert: "Error. Please Try again later"
+    unless @friend_request.friend_id == current_user.id
+      return redirect_to friend_requests_path, alert: "Only the recipient can accept this request."
     end
+
+    @friend_request.accept
+    redirect_to friend_requests_path, notice: "Friend accepted."
+  rescue ActiveRecord::RecordInvalid
+    redirect_to friend_requests_path, alert: "Could not accept the request."
   end
 
   def destroy
-    @friend_request.destroy
-    if @friend_request.save
-      redirect_to friend_requests_path, notice: "Successfully Cancelled"
-    else
-      redirect_to friend_requests_path, alert: "Error. Please Try again later"
+    unless [@friend_request.user_id, @friend_request.friend_id].include?(current_user.id)
+      return redirect_to friend_requests_path, alert: "Not authorized."
     end
+
+    @friend_request.destroy!
+    redirect_to friend_requests_path, notice: "Friend request removed.", status: :see_other
   end
 
   private
@@ -40,5 +48,4 @@ class FriendRequestsController < ApplicationController
   def set_friend_request
     @friend_request = FriendRequest.find(params[:id])
   end
-
 end

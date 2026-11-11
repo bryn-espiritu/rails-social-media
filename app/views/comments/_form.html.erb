@@ -1,17 +1,16 @@
-
-
-<%= form_with model: comment, url: path do |f| %>
-  <% if @comment.errors.any? %>
-    <ul>
-      <% @comment.errors.each do |error| %>
-        <li><%= error.full_message %></li>
-      <% end %>
-    </ul>
+<div class="container my-4">
+  <%= form_with model: [post, comment] do |f| %>
+    <% if comment.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% comment.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <%= f.label :content, class: "form-label" %>
+    <%= f.text_area :content, class: "form-control mb-3", required: true, rows: 4 %>
+    <%= f.submit "Save comment", class: "btn btn-primary" %>
   <% end %>
-
-  <div class="field my-3">
-    Create One!
-    <%= f.text_area :content, class: 'form-control mb-3', placeholder: "What's your Comment?" %>
-    <%= f.submit "Post", class: "btn btn-outline-primary" %>
-  </div>
-<% end %>
+</div>

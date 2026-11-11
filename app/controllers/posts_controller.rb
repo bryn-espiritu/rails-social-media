@@ -1,25 +1,28 @@
 class PostsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_post, only: [:edit, :update, :destroy]
-  include Pundit
-  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  before_action :authorize_owner!, only: [:edit, :update, :destroy]
 
   def index
-    @posts = Post.includes(:user).public_tag
+    @feed = params[:feed] == "mine" ? "mine" : "all"
+    @posts = if @feed == "mine"
+               current_user.posts
+             else
+               Post.visible_to(current_user)
+             end
+    @posts = @posts.includes(:user).order(created_at: :desc)
   end
 
   def new
-    @post = Post.new
+    @post = current_user.posts.new
   end
 
   def create
-    @post = Post.new(post_params)
-    @post.user = current_user
+    @post = current_user.posts.new(post_params)
     if @post.save
-      redirect_to posts_path, notice: "post is Successfully Submitted"
+      redirect_to posts_path, notice: "Post successfully created."
     else
-      flash[:alert] = @post.errors.full_messages.join(', ')
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -27,14 +30,15 @@ class PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
-      redirect_to posts_path
+      redirect_to posts_path, notice: "Post successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    if @post.destroy
-      redirect_to post_paths, notice: "post successfully deleted"
-    end
+    @post.destroy!
+    redirect_to posts_path, notice: "Post successfully deleted.", status: :see_other
   end
 
   private
@@ -44,15 +48,10 @@ class PostsController < ApplicationController
   end
 
   def set_post
-    @post = Post.find(params[:id] || params[:post_id])
+    @post = current_user.posts.find(params[:id])
   end
 
-  def user_not_authorized(exception)
-    policy_name = exception.policy.class.to_s.underscore
-    flash[:alert] = t "#{policy_name}.#{exception.query}", scope: 'pundit', default: :default,
-                      username: exception.policy.record&.user&.email
-    redirect_to(request.referrer || root_path)
+  def authorize_owner!
+    authorize @post
   end
-
 end
-
