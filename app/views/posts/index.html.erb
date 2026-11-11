@@ -3,12 +3,21 @@
     <h1>Social feed</h1>
     <%= link_to "Create post", new_post_path, class: "btn btn-primary" %>
   </div>
-  <div class="btn-group mb-4" role="group" aria-label="Choose feed">
-    <%= link_to "All visible posts", posts_path, class: "btn #{@feed == 'all' ? 'btn-primary' : 'btn-outline-primary'}" %>
-    <%= link_to "My posts", posts_path(feed: :mine), class: "btn #{@feed == 'mine' ? 'btn-primary' : 'btn-outline-primary'}" %>
+  <div class="btn-group mb-3" role="group" aria-label="Choose feed">
+    <%= link_to "All visible posts", posts_path(feed: :all, q: @query), class: "btn #{@feed == 'all' ? 'btn-primary' : 'btn-outline-primary'}" %>
+    <%= link_to "My posts", posts_path(feed: :mine, q: @query), class: "btn #{@feed == 'mine' ? 'btn-primary' : 'btn-outline-primary'}" %>
   </div>
+  <%= form_with url: posts_path, method: :get, class: "d-flex gap-2 mb-4" do |form| %>
+    <%= form.hidden_field :feed, value: @feed %>
+    <%= form.search_field :q, value: @query, placeholder: "Search post titles or content", maxlength: 100, class: "form-control", aria: { label: "Search posts" } %>
+    <%= form.submit "Search", class: "btn btn-outline-primary" %>
+    <% if @query.present? %>
+      <%= link_to "Clear", posts_path(feed: @feed), class: "btn btn-outline-secondary" %>
+    <% end %>
+  <% end %>
+
   <% if @posts.empty? %>
-    <p class="text-muted">No posts to show yet.</p>
+    <p class="text-muted">No matching posts found.</p>
   <% end %>
   <% @posts.each do |post| %>
     <article class="card mb-4">
@@ -23,12 +32,32 @@
         <h3 class="h5"><%= post.name %></h3>
         <p><%= post.content %></p>
         <p class="text-muted small"><%= time_ago_in_words(post.created_at) %> ago</p>
-        <%= link_to "Comments", post_comments_path(post), class: "btn btn-outline-primary btn-sm" %>
-        <% if post.user_id == current_user.id %>
-          <%= link_to "Edit", edit_post_path(post), class: "btn btn-outline-secondary btn-sm" %>
-          <%= button_to "Delete", post_path(post), method: :delete, class: "btn btn-outline-danger btn-sm d-inline-block" %>
-        <% end %>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <% liked = @liked_post_ids.include?(post.id) %>
+          <% if liked %>
+            <%= button_to "♥ Unlike", post_like_path(post), method: :delete, class: "btn btn-danger btn-sm" %>
+          <% else %>
+            <%= button_to "♡ Like", post_like_path(post), method: :post, class: "btn btn-outline-danger btn-sm" %>
+          <% end %>
+          <span class="text-muted small"><%= pluralize(post.likes.size, "like") %></span>
+          <%= link_to "Comments", post_comments_path(post), class: "btn btn-outline-primary btn-sm" %>
+          <% if post.user_id == current_user.id %>
+            <%= link_to "Edit", edit_post_path(post), class: "btn btn-outline-secondary btn-sm" %>
+            <%= button_to "Delete", post_path(post), method: :delete, class: "btn btn-outline-danger btn-sm" %>
+          <% end %>
+        </div>
       </div>
     </article>
+  <% end %>
+  <% if @total_pages > 1 %>
+    <nav aria-label="Post pages" class="d-flex align-items-center gap-3 my-4">
+      <% if @page > 1 %>
+        <%= link_to "← Previous", posts_path(feed: @feed, q: @query, page: @page - 1), class: "btn btn-outline-primary" %>
+      <% end %>
+      <span>Page <%= @page %> of <%= @total_pages %></span>
+      <% if @page < @total_pages %>
+        <%= link_to "Next →", posts_path(feed: @feed, q: @query, page: @page + 1), class: "btn btn-outline-primary" %>
+      <% end %>
+    </nav>
   <% end %>
 </div>
